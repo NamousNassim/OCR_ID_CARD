@@ -1,0 +1,101 @@
+/* General Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    color: white;
+    text-align: center;
+    padding: 80px 20px;
+  }
+  
+  .hero h1 {
+    font-size: 3rem;
+    font-weight: 800;
+  }
+  
+  .hero p {
+    font-size: 1.25rem;
+    margin-bottom: 30px;
+  }
+  
+  /* Buttons */
+  button {
+    transition: all 0.3s ease;
+  }
+  
+  button:hover {
+    transform: scale(1.05);
+  }
+  
+  button:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  /* Features Section */
+  .features-section {
+    padding: 80px 20px;
+    background-color: #ffffff;
+  }
+  
+  .features-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+  }
+  
+  .features-section .feature {
+    background-color: #f3f4f6;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .features-section .feature h3 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .features-section .feature p {
+    color: #4b5563;
+  }
+  
+
+  .cta-section {
+    background-color: #2563eb;
+    color: white;
+    text-align: center;
+    padding: 80px 20px;
+  }
+  
+  .cta-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+  }
+  
+  .cta-section p {
+    font-size: 1.25rem;
+    margin-bottom: 30px;
+  }
+  
+
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 2.5rem;
+    }
+  
+    .features-section h2 {
+      font-size: 2rem;
+    }
+  
+    .cta-section h2 {
+      font-size: 2rem;
+    }
+  }
+  

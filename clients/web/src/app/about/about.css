@@ -1,0 +1,53 @@
+ 
+.logo-icon {
+    background: linear-gradient(135deg, #4f46e5, #ec4899);
+    color: white;
+    font-size: 2.5rem;
+    padding: 1rem;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .team-member img {
+    border-radius: 50%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .team-member img:hover {
+    transform: scale(1.1);
+  }
+  
+  .social-links a {
+    margin: 0 0.5rem;
+    color: #4f46e5;
+    transition: color 0.3s ease;
+  }
+  
+  .social-links a:hover {
+    color: #ec4899;
+  }
+  
+  .technology-card {
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .technology-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .technology-logo {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto 0.5rem;
+  }
+  

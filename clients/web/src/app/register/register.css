@@ -1,0 +1,89 @@
+/* Custom styles for the registration page */
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .bg-gradient-to-br {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  /* Form field animations */
+  input {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  input:focus {
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+  }
+  
+  /* Password strength indicator animations */
+  .h-1 {
+    transition: background-color 0.3s ease;
+  }
+  
+  /* Custom checkbox styles */
+  input[type="checkbox"] {
+    cursor: pointer;
+  }
+  
+  input[type="checkbox"]:checked {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+  }
+  
+  /* Button hover effects */
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Link hover animations */
+  a {
+    transition: color 0.2s ease;
+  }
+  
+  /* Error state styles */
+  .error-input {
+    border-color: #ef4444;
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  
+  @keyframes shake {
+    10%, 90% {
+      transform: translateX(-1px);
+    }
+    20%, 80% {
+      transform: translateX(2px);
+    }
+    30%, 50%, 70% {
+      transform: translateX(-4px);
+    }
+    40%, 60% {
+      transform: translateX(4px);
+    }
+  }
+  
+  /* Success state animations */
+  @keyframes successPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.2);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+    }
+  }
+  
+  .success-input {
+    border-color: #34d399;
+    animation: successPulse 2s infinite;
+  }
