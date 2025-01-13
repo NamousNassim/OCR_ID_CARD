@@ -4,6 +4,6 @@ from services.extraction_service import extract_text_from_image
 
 router = APIRouter()
 
-@router.post("/extract-text/")
+@router.post("/extract/")
 async def extract_text(file: UploadFile = File(...)):
     return await extract_text_from_image(file)  
