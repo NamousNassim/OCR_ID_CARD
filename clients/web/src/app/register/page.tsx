@@ -2,17 +2,46 @@
 
 import { useState } from 'react';
 import { FaGoogle } from "react-icons/fa";
-
-import Image from 'next/image';
+import axios from 'axios';
 import './register.css';
+
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleRegister = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsLoading(true);
+
+    if (password !== confirmPassword) {
+      console.error('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/v1/auth/register', {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: password
+      });
+      console.log('Registration successful:', response.data);
+    } catch (error) {
+      console.error('Registration failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleGoogleRegister = async () => {
     setIsLoading(true);
     try {
-      // Implement Google sign-up
       console.log('Google sign-up clicked');
     } catch (error) {
       console.error('Registration failed:', error);
@@ -34,14 +63,12 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-pink-100 flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
-    
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-800">Create Account</h2>
             <p className="text-gray-500 mt-2">Join us today and get started</p>
           </div>
 
-         
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleRegister}>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="firstName" className="text-sm font-medium text-gray-700">
@@ -52,6 +79,8 @@ export default function RegisterPage() {
                   id="firstName"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
                   placeholder="John"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                 />
               </div>
               <div className="space-y-2">
@@ -63,6 +92,8 @@ export default function RegisterPage() {
                   id="lastName"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
                   placeholder="Doe"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                 />
               </div>
             </div>
@@ -76,6 +107,8 @@ export default function RegisterPage() {
                 id="email"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
                 placeholder="john@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -88,7 +121,11 @@ export default function RegisterPage() {
                 id="password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
                 placeholder="Create a strong password"
-                onChange={(e) => checkPasswordStrength(e.target.value)}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  checkPasswordStrength(e.target.value);
+                }}
               />
             
               <div className="flex gap-1 mt-1">
@@ -117,6 +154,8 @@ export default function RegisterPage() {
                 id="confirmPassword"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
                 placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
             </div>
 
@@ -141,12 +180,12 @@ export default function RegisterPage() {
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200"
+              disabled={isLoading}
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 
-        
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -156,7 +195,6 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          
           <button
             onClick={handleGoogleRegister}
             disabled={isLoading}
@@ -166,7 +204,6 @@ export default function RegisterPage() {
             <span className="text-gray-700">Sign up with Google</span>
           </button>
 
-          
           <p className="text-center text-sm text-gray-600">
             Already have an account?{' '}
             <a href="#" className="text-indigo-600 hover:text-indigo-800 font-medium">

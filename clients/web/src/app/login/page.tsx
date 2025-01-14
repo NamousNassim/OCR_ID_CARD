@@ -1,17 +1,34 @@
 "use client";
 import { useState } from 'react';
 import { FaGoogle } from "react-icons/fa";
-import Image from 'next/image';
+import axios from 'axios';
 import './login.css';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:8000/api/v1/auth/login', {
+        username: email,
+        password: password
+      });
+      console.log('Login successful:', response.data);
+    } catch (error) {
+      console.error('Login failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
-   
     try {
-     
       console.log('Google sign-in clicked');
     } catch (error) {
       console.error('Login failed:', error);
@@ -30,8 +47,7 @@ export default function LoginPage() {
             <p className="text-gray-500 mt-2">Please sign in to continue</p>
           </div>
 
-        
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email
@@ -41,6 +57,8 @@ export default function LoginPage() {
                 id="email"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 outline-none"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -53,6 +71,8 @@ export default function LoginPage() {
                 id="password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 outline-none"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
@@ -75,12 +95,12 @@ export default function LoginPage() {
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
-        
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -95,11 +115,10 @@ export default function LoginPage() {
             disabled={isLoading}
             className="w-full flex items-center justify-center gap-3 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200"
           >
-           <FaGoogle/>
+            <FaGoogle />
             <span className="text-gray-700">Sign in with Google</span>
           </button>
 
-        
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{' '}
             <a href="#" className="text-blue-600 hover:text-blue-800 font-medium">

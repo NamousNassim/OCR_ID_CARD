@@ -16,6 +16,7 @@ class PyObjectId(ObjectId):
 
 class UserModel(BaseModel):
     id: Optional[PyObjectId] = None
+    username: str
     email: EmailStr
     hashed_password: str
     is_active: bool = True
