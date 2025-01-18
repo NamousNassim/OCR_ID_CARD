@@ -1,4 +1,10 @@
-from fastapi import FastAPI 
+import sys
+import os
+from fastapi import FastAPI
+
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from api.routes import router
 
 app = FastAPI()

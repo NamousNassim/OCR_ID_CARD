@@ -3,7 +3,15 @@
 import { useState } from 'react';
 import { FaGoogle } from "react-icons/fa";
 import axios from 'axios';
-import './register.css';
+
+interface FormErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  terms?: string;
+}
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,27 +21,76 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [registrationError, setRegistrationError] = useState('');
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    
+    if (!firstName) newErrors.firstName = 'First name is required';
+    if (!lastName) newErrors.lastName = 'Last name is required';
+    if (!email) newErrors.email = 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email is invalid';
+    
+    if (!password) newErrors.password = 'Password is required';
+    else if (password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+    
+    if (!confirmPassword) newErrors.confirmPassword = 'Please confirm your password';
+    else if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    
+    if (!termsAccepted) newErrors.terms = 'You must accept the terms and conditions';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleRegister = async (event: React.FormEvent) => {
     event.preventDefault();
-    setIsLoading(true);
+    setRegistrationError('');
+    setRegistrationSuccess(false);
 
-    if (password !== confirmPassword) {
-      console.error('Passwords do not match');
-      setIsLoading(false);
+    if (!validateForm()) {
       return;
     }
 
+    setIsLoading(true);
+
+    const formData = new FormData();
+    formData.append('username', `${firstName} ${lastName}`);
+    formData.append('email', email);
+    formData.append('password', password);
+    if (profilePicture) {
+      formData.append('profile_picture', profilePicture);
+    }
+
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/auth/register', {
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        password: password
+      const response = await axios.post('http://localhost:8001/register/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
+      
       console.log('Registration successful:', response.data);
-    } catch (error) {
+      setRegistrationSuccess(true);
+      
+      // Clear the form
+      setFirstName('');
+      setLastName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setProfilePicture(null);
+      setTermsAccepted(false);
+      
+    } catch (error: any) {
       console.error('Registration failed:', error);
+      setRegistrationError(
+        error.response?.data?.detail || 
+        'Registration failed. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -42,9 +99,11 @@ export default function RegisterPage() {
   const handleGoogleRegister = async () => {
     setIsLoading(true);
     try {
+      // Implement Google OAuth logic here
       console.log('Google sign-up clicked');
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('Google registration failed:', error);
+      setRegistrationError('Google registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +122,18 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-pink-100 flex items-center justify-center p-4 pt-20">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          {registrationSuccess && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+              Registration successful! Please check your email to verify your account.
+            </div>
+          )}
+
+          {registrationError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+              {registrationError}
+            </div>
+          )}
+
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-800">Create Account</h2>
             <p className="text-gray-500 mt-2">Join us today and get started</p>
@@ -77,11 +148,16 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   id="firstName"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none ${
+                    errors.firstName ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="John"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                 />
+                {errors.firstName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
+                )}
               </div>
               <div className="space-y-2">
                 <label htmlFor="lastName" className="text-sm font-medium text-gray-700">
@@ -90,11 +166,16 @@ export default function RegisterPage() {
                 <input
                   type="text"
                   id="lastName"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none ${
+                    errors.lastName ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="Doe"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                 />
+                {errors.lastName && (
+                  <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+                )}
               </div>
             </div>
 
@@ -105,11 +186,16 @@ export default function RegisterPage() {
               <input
                 type="email"
                 id="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none ${
+                  errors.email ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="john@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -119,7 +205,9 @@ export default function RegisterPage() {
               <input
                 type="password"
                 id="password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none ${
+                  errors.password ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="Create a strong password"
                 value={password}
                 onChange={(e) => {
@@ -127,15 +215,15 @@ export default function RegisterPage() {
                   checkPasswordStrength(e.target.value);
                 }}
               />
-            
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
               <div className="flex gap-1 mt-1">
                 {[...Array(4)].map((_, i) => (
                   <div
                     key={i}
                     className={`h-1 w-full rounded-full ${
-                      i < passwordStrength
-                        ? 'bg-indigo-600'
-                        : 'bg-gray-200'
+                      i < passwordStrength ? 'bg-indigo-600' : 'bg-gray-200'
                     }`}
                   />
                 ))}
@@ -152,10 +240,32 @@ export default function RegisterPage() {
               <input
                 type="password"
                 id="confirmPassword"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none ${
+                  errors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                }`}
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="profilePicture" className="text-sm font-medium text-gray-700">
+                Profile Picture
+              </label>
+              <input
+                type="file"
+                id="profilePicture"
+                accept="image/*"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 outline-none"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setProfilePicture(e.target.files[0]);
+                  }
+                }}
               />
             </div>
 
@@ -163,7 +273,11 @@ export default function RegisterPage() {
               <input
                 type="checkbox"
                 id="terms"
-                className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                className={`mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded ${
+                  errors.terms ? 'border-red-500' : ''
+                }`}
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
               />
               <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
                 I agree to the{' '}
@@ -176,10 +290,13 @@ export default function RegisterPage() {
                 </a>
               </label>
             </div>
+            {errors.terms && (
+              <p className="text-red-500 text-xs mt-1">{errors.terms}</p>
+            )}
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200"
+              className="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               {isLoading ? 'Creating Account...' : 'Create Account'}

@@ -34,7 +34,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <a href="/" className="flex items-center">
-              <span className="text-2xl font-bold text-indigo-600">Logo</span>
+              <span className="text-2xl font-bold text-indigo-600">OCR ID</span>
             </a>
           </div>
 

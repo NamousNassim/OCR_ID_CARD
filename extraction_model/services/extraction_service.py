@@ -47,7 +47,8 @@ async def extract_text_from_image(file: UploadFile):
     )
 
     torch.cuda.empty_cache()
-    inputs = {key: val.to("cuda") for key, val in inputs.items()}
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    inputs = {key: val.to(device) for key, val in inputs.items()}
 
     try:
         generated_ids = model.generate(**inputs, max_new_tokens=128)
